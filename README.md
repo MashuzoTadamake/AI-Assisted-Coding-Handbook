@@ -615,3 +615,6 @@ Try the main action yourself. Check errors and response times. Keep the deployed
 Links appear beside the advice they support. The guide was initially inspired by [EnzeD/vibe-coding](https://github.com/EnzeD/vibe-coding).
 
 The prompt templates and workflow choices are practical suggestions. The skills above were checked against their publishers' repositories, but were not installed or benchmarked for this guide. Configuration, access, and supported features can change—check the linked instructions when setting something up.
+
+---
+Updated: 09-11-2026
