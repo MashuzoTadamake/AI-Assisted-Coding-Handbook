@@ -168,6 +168,8 @@ There is no need to restart after every small change. Keep going while the conve
 
 ## 6. How to write a good prompt
 
+**Prompt engineering means writing, trying, and improving instructions so the result matches your needs.** Start with a clear request; add detail when it solves a specific problem.
+
 A useful prompt answers **what you want, what the situation is, what limits matter, and how to tell whether it worked**.
 
 Paste it as a normal message. No special command is needed. You can save the template for reuse.
@@ -175,6 +177,9 @@ Paste it as a normal message. No special command is needed. You can save the tem
 ### The main template
 
 ```text
+ROLE (optional)
+[A useful perspective, such as accessibility reviewer.]
+
 GOAL
 [What should the user be able to do?]
 
@@ -197,6 +202,30 @@ Explain unfamiliar parts briefly.
 ```
 
 You can shorten this for easy tasks. The headings help organize information; they are optional.
+
+### "Act as" and "perform as": when a role helps
+
+A role tells the assistant which perspective to use. You can write "act as," "perform as," or simply describe the job. There is no special command to activate.
+
+Make the role useful by naming its responsibilities:
+
+| Situation | Useful role instruction |
+|---|---|
+| Development | Act as a code reviewer. Look for incorrect behavior and missing tests. |
+| Security | Review this endpoint for authorization problems, especially access to another user's data. |
+| Frontend | Act as an accessibility reviewer. Check keyboard use, labels, focus, and error messages. |
+| Database | Review this PostgreSQL migration for data loss, locking, and compatibility with the old app. |
+
+Example:
+
+```text
+Act as an accessibility reviewer for this checkout form.
+Check keyboard navigation, field labels, focus, and error messages.
+Report each problem with its location, effect on the user, and suggested fix.
+Do not edit yet. State which checks you could not perform.
+```
+
+For a small change, "Fix this button's label" is enough. A role cannot replace project information, working tools, or verification. Judge the result by evidence, not how expert the response sounds. Anthropic documents roles as a way to focus behavior and tone. [Role prompting guidance](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices#give-claude-a-role)
 
 ### Filled-in example
 
@@ -224,6 +253,55 @@ Inspect the existing flow, implement the feature, and run relevant checks.
 FINISH WITH
 Explain the changed files, permission check, and test results.
 ```
+
+### Six habits for better results
+
+1. **Name the action.** Say "implement," "investigate," "explain," or "review." Make clear whether files should change.
+2. **Replace vague words with checks.** Instead of "make it better," specify the behavior, audience, or problem.
+3. **Include relevant evidence.** Give the error, screenshot, file, example, or reference the assistant needs.
+4. **Explain important constraints.** "Keep the response format because an older mobile app depends on it."
+5. **Describe the output.** "Return a short list with file, problem, suggested fix, and test result."
+6. **Check and revise.** Try the result against the same requirements. Correct the prompt using what failed.
+
+Official OpenAI documentation covers clear instructions, relevant context, examples, and evaluating prompt changes. These habits are practical adaptations for coding tasks, not guaranteed improvements for every model. [OpenAI prompt engineering](https://developers.openai.com/api/docs/guides/prompt-engineering)
+
+### Show an example when words are not enough
+
+Examples help communicate formatting or behavior. One can be enough to start; add different cases when a rule is easy to misunderstand. This is often called **few-shot prompting** when you provide several examples.
+
+```text
+Write validation messages in this style:
+Empty email → "Enter your email address."
+Invalid email → "Enter a valid email address, such as name@example.com."
+
+Now write messages for an empty password and a password shorter than
+12 characters. Tell the user how to fix the problem.
+```
+
+For coding, you can point to an existing implementation: "Follow the response format in `src/api/orders.ts`." Use an example that matches the behavior you actually want. [Examples guidance](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices#use-examples-effectively)
+
+### Improve a result with specific feedback
+
+```text
+The result still fails when [specific situation].
+Expected: [result].
+Actual: [result or error].
+Keep [parts that already work].
+Investigate this failure, make a focused correction, and rerun the check.
+```
+
+For a large or unclear task, first ask for an investigation or short plan. Once the direction is clear, authorize implementation. For a simple task, one request is usually enough.
+
+If you cannot express the task clearly yet, use:
+
+```text
+Help me improve this request before implementing it: [rough request].
+Identify missing decisions that would change the result.
+Ask only the questions needed, then rewrite it as a clear coding prompt.
+Do not invent requirements I have not agreed to.
+```
+
+Prompting is an iterative process; there is no single perfect template. [OpenAI practical prompting guide](https://developers.openai.com/cookbook/examples/chatgpt/chatgpt_prompt_guide/chatgpt_prompt_guide)
 
 ### Three shorter prompts
 
@@ -261,7 +339,11 @@ Show the result and explain the main changes.
 - Several unrelated tasks in one request.
 - Rules that do not matter to the task.
 
-If the result is wrong, add the missing fact or a failing example. Repeating “fix it properly” gives the assistant little new information.
+Ask for a brief explanation, assumptions, and check results. OpenAI's guidance for reasoning models recommends simple, direct prompts rather than demanding an internal step-by-step reasoning transcript. [Reasoning-model guidance](https://developers.openai.com/api/docs/guides/reasoning-best-practices)
+
+Keep a saved prompt when it works repeatedly. If you compare two versions, use the same task and checks, and include retries and review time. A longer prompt is useful only when the extra information helps.
+
+Prompting sources in this section were checked on **11 November 2026**. Its templates are suggestions, not benchmarked recipes. Other sections retain their earlier research dates.
 
 ## 7. Understand the generated code
 
